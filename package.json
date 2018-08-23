@@ -1,0 +1,21 @@
+{
+  "name": "node-api",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "chandan kumar",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/chandankumar4/ci-dashboard.git"
+  },
+  "dependencies": {
+    "cors": "~2.8.4",
+    "express": "~4.16.1",
+    "moment": "^2.22.2",
+    "moment-duration-format": "^2.2.2",
+    "node-datetime": "^2.0.9",
+    "request": "^2.88.0"
+  }
+}
