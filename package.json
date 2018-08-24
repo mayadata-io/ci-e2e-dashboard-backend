@@ -12,10 +12,10 @@
   },
   "dependencies": {
     "cors": "~2.8.4",
+    "dateformat": "^3.0.3",
     "express": "~4.16.1",
     "moment": "^2.22.2",
     "moment-duration-format": "^2.2.2",
-    "node-datetime": "^2.0.9",
     "request": "^2.88.0"
   }
 }
