@@ -124,7 +124,7 @@ function main() {
                 data[i].cloud_id = 1;
                 data[i].log_link = "https://e2elogs.test.openebs.io/app/kibana#/discover?_g=(refreshInterval:('$$hashKey':'object:2232',display:'10+seconds',pause:!f,section:1,value:10000),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:commit_id,negate:!f,params:(query:'" + data[i].sha + "',type:phrase),type:phrase,value:'" + data[i].sha + "'),query:(match:(commit_id:(query:'" + data[i].sha + "',type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:pipeline_id,negate:!f,params:(query:'"+ p_id + "',type:phrase),type:phrase,value:'"+ p_id + "'),query:(match:(pipeline_id:(query:'"+ p_id + "',type:phrase))))),index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))";
                 var k = 0;
-                if (aws_job != "") {
+                if (aws_job != "" && aws_job[k] != undefined) {
                     while(aws_job[k][0].pipeline.id !== p_id) {
                         k++;
                         if(aws_job[k] == undefined) {
@@ -138,16 +138,20 @@ function main() {
                 }
             }
             pipelines[0] = data;
-        }).then(function() {
-            var index = 0;
-            for(var p = 0; p < pipelines[0].length; p++) {
-                aws_jobs(pipelines[0][p].id).then(function(data) {
-                    aws_job[index] = data;
-                    index++;
-                });
-            }
         }).catch(function (err) {
             console.log("aws pipeline error ->",err);
+        }).then(function() {
+            var index = 0;
+            if (pipelines[0] != undefined) {
+                for(var p = 0; p < pipelines[0].length; p++) {
+                    aws_jobs(pipelines[0][p].id).then(function(data) {
+                        aws_job[index] = data;
+                        index++;
+                    });
+                }
+            }
+        }).catch(function (err) {
+            console.log("aws jobs error ->",err);
         });
         gcp_pipeline().then(function(data) {
             for (var j = 0; j < data.length; j++) {
@@ -155,10 +159,10 @@ function main() {
                 data[j].cloud_id = 2;
                 data[j].log_link = "https://e2elogs.test.openebs.io/app/kibana#/discover?_g=(refreshInterval:('$$hashKey':'object:2232',display:'10+seconds',pause:!f,section:1,value:10000),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:commit_id,negate:!f,params:(query:'" + data[j].sha + "',type:phrase),type:phrase,value:'" + data[j].sha + "'),query:(match:(commit_id:(query:'" + data[j].sha + "',type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:pipeline_id,negate:!f,params:(query:'"+ p_id + "',type:phrase),type:phrase,value:'"+ p_id + "'),query:(match:(pipeline_id:(query:'"+ p_id + "',type:phrase))))),index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))";
                 var k = 0;
-                if (gcp_job != "" && aws_job[k] != undefined) {
+                if (gcp_job != "" && gcp_job[k] != undefined) {
                     while(gcp_job[k][0].pipeline.id !== p_id) {
                         k++;
-                        if(aws_job[k] == undefined) {
+                        if(gcp_job[k] == undefined) {
                             break;
                         }
                     }
@@ -169,16 +173,20 @@ function main() {
                 }
             }
             pipelines[1] = data;
-        }).then(function() {
-            var index = 0;
-            for(var p = 0; p < pipelines[1].length; p++) {
-                gcp_jobs(pipelines[1][p].id).then(function(data) {
-                    gcp_job[index] = data;
-                    index++;
-                });
-            }
         }).catch(function (err) {
             console.log("gcp pipeline error ->",err);
+        }).then(function() {
+            var index = 0;
+            if (pipelines[1] != undefined) {
+                for(var p = 0; p < pipelines[1].length; p++) {
+                    gcp_jobs(pipelines[1][p].id).then(function(data) {
+                        gcp_job[index] = data;
+                        index++;
+                    });
+                }
+            }
+        }).catch(function (err) {
+            console.log("gcp jobs error ->",err);
         });
         commits().then(function(data) {
             last_update = calculate(data[0].created_at);
@@ -194,7 +202,7 @@ function main() {
         app.get("/", function(req, res)  {
             res.json(dashboard);
         });
-    },6000 );
+    },20000 );
 }
 app.listen(port, function() {
     console.log("server is listening on port:", port);
