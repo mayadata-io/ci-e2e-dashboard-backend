@@ -11,7 +11,7 @@ npm install
 ### start backend server
 
 ```bash
-node server.js
+token=<gitlab-api-token> node server.js
 ```
 
 backend server run on http://localhost:3000

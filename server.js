@@ -7,7 +7,7 @@ var cors = require('cors');
 var moment = require('moment');
 var dateFormat = require('dateformat');
 var dashboard = [], pipelines = [] , commits_data = [], last_update, aws_job = [], gcp_job = [];
-var gitlab_private_token = "<private-token>";
+var gitlab_private_token = process.env.token;
 
 var cloud = [{"cloud_id":1,"cloud_name":"aws"},{"cloud_id":2,"cloud_name":"gce"}];
 
@@ -18,7 +18,7 @@ function commits() {
     };
     return new Promise(function(resolve, reject){
         request(commit, function(err, response, body) {
-            if(err) {
+            if(err  || response.statusCode != 200) {
                 reject(err);
             } else {
                 var data = [];
@@ -39,7 +39,7 @@ function aws_pipeline() {
     };
     return new Promise(function(resolve, reject){
         request(aws, function(err, response, body) {
-            if (err) {
+            if (err  || response.statusCode != 200) {
                 reject(err);
             } else {
                 var data = [];
@@ -60,7 +60,7 @@ function aws_jobs(id) {
     };
     return new Promise(function(resolve, reject){
         request(aws_jobs, function(err, response, body) {
-            if (err) {
+            if (err  || response.statusCode != 200) {
                 reject(err);
             } else {
                 data = JSON.parse(body)
@@ -77,7 +77,7 @@ function gcp_pipeline() {
     };
     return new Promise(function(resolve, reject){
         request(aws, function(err, response, body) {
-            if (err) {
+            if (err  || response.statusCode != 200) {
                 reject(err);
             } else {
                 var data = [];
@@ -98,7 +98,7 @@ function gcp_jobs(id) {
     };
     return new Promise(function(resolve, reject){
         request(gcp_jobs, function(err, response, body) {
-            if (err) {
+            if (err  || response.statusCode != 200) {
                 reject(err);
             } else {
                 data = JSON.parse(body)
