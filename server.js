@@ -6,10 +6,10 @@ var request = require('request');
 var cors = require('cors');
 var moment = require('moment');
 var dateFormat = require('dateformat');
-var dashboard = [], pipelines = [] , commits_data = [], last_update, aws_job = [], gcp_job = [];
-var gitlab_private_token = "<private-token>";
+var dashboard = [], pipelines = [] , commits_data = [], last_update, aws_job = [], gcp_job = [], azure_job = [], packet_job = [];
+var gitlab_private_token = process.env.token;
 
-var cloud = [{"cloud_id":1,"cloud_name":"aws"},{"cloud_id":2,"cloud_name":"gce"}];
+var cloud = [{"cloud_id":1,"cloud_name":"aws"},{"cloud_id":2,"cloud_name":"gce"},{"cloud_id":3,"cloud_name":"packet"},{"cloud_id":4,"cloud_name":"azure"}];
 
 function commits() {
     var commit = {
@@ -18,15 +18,19 @@ function commits() {
     };
     return new Promise(function(resolve, reject){
         request(commit, function(err, response, body) {
-            if(err) {
+            if(err  || response.statusCode != 200) {
                 reject(err);
             } else {
                 var data = [];
                 body = JSON.parse(body);
-                for(var i = 0; i < 10; i++) {
-                    data[i] = body[i];
+                if (body.length > 10) {
+                    for (var i = 0; i < 10; i++) {
+                        data[i] = body[i]
+                    }
+                    resolve(data);
+                } else {
+                    resolve(body);
                 }
-                resolve(data);
             }
         });
     });
@@ -39,15 +43,19 @@ function aws_pipeline() {
     };
     return new Promise(function(resolve, reject){
         request(aws, function(err, response, body) {
-            if (err) {
+            if (err  || response.statusCode != 200) {
                 reject(err);
             } else {
                 var data = [];
                 body = JSON.parse(body);
-                for (var i = 0; i < 10; i++) {
-                    data[i] = body[i];
+                if (body.length > 10) {
+                    for (var i = 0; i < 10; i++) {
+                        data[i] = body[i]
+                    }
+                    resolve(data);
+                } else {
+                    resolve(body);
                 }
-                resolve(data);
             }
         });
     });
@@ -60,7 +68,7 @@ function aws_jobs(id) {
     };
     return new Promise(function(resolve, reject){
         request(aws_jobs, function(err, response, body) {
-            if (err) {
+            if (err  || response.statusCode != 200) {
                 reject(err);
             } else {
                 data = JSON.parse(body)
@@ -77,15 +85,19 @@ function gcp_pipeline() {
     };
     return new Promise(function(resolve, reject){
         request(aws, function(err, response, body) {
-            if (err) {
+            if (err  || response.statusCode != 200) {
                 reject(err);
             } else {
                 var data = [];
                 body = JSON.parse(body);
-                for (var i = 0; i < 10; i++) {
-                    data[i] = body[i];
+                if (body.length > 10) {
+                    for (var i = 0; i < 10; i++) {
+                        data[i] = body[i]
+                    }
+                    resolve(data);
+                } else {
+                    resolve(body);
                 }
-                resolve(data);
             }
         });
     });
@@ -98,7 +110,91 @@ function gcp_jobs(id) {
     };
     return new Promise(function(resolve, reject){
         request(gcp_jobs, function(err, response, body) {
-            if (err) {
+            if (err  || response.statusCode != 200) {
+                reject(err);
+            } else {
+                data = JSON.parse(body)
+                resolve(data);
+            }
+        });
+    });
+}
+
+function packet_pipeline() {
+    var packet = {
+        url: 'https://gitlab.openebs.ci/api/v4/projects/20/pipelines',
+        headers: {'PRIVATE-TOKEN': gitlab_private_token}
+    };
+    return new Promise(function(resolve, reject) {
+        request(packet, function(err, response, body) {
+            if (err || response.statusCode != 200) {
+                reject(err);
+            } else {
+                var data = [];
+                body = JSON.parse(body);
+                if (body.length > 10) {
+                    for (var i = 0; i < 10; i++) {
+                        data[i] = body[i]
+                    }
+                    resolve(data);
+                } else {
+                    resolve(body);
+                }
+            }
+        });
+    });
+}
+
+function packet_jobs(id) {
+    var packet_jobs = {
+        url: "https://gitlab.openebs.ci/api/v4/projects/20/pipelines/+"+id+"/jobs",
+        headers: {'PRIVATE-TOKEN': gitlab_private_token}
+    };
+    return new Promise(function(resolve, reject){
+        request(packet_jobs, function(err, response, body) {
+            if (err  || response.statusCode != 200) {
+                reject(err);
+            } else {
+                data = JSON.parse(body)
+                resolve(data);
+            }
+        });
+    });
+}
+
+function azure_pipeline() {
+    var azure = {
+        url: 'https://gitlab.openebs.ci/api/v4/projects/19/pipelines',
+        headers: {'PRIVATE-TOKEN': gitlab_private_token}
+    };
+    return new Promise(function(resolve, reject) {
+        request(azure, function(err, response, body) {
+            if (err || response.statusCode != 200) {
+                reject(err);
+            } else {
+                var data = [];
+                body = JSON.parse(body);
+                if (body.length > 10) {
+                    for (var i = 0; i < 10; i++) {
+                        data[i] = body[i]
+                    }
+                    resolve(data);
+                } else {
+                    resolve(body);
+                }
+            }
+        });
+    });
+}
+
+function azure_jobs(id) {
+    var azure_jobs = {
+        url: "https://gitlab.openebs.ci/api/v4/projects/19/pipelines/+"+id+"/jobs",
+        headers: {'PRIVATE-TOKEN': gitlab_private_token}
+    };
+    return new Promise(function(resolve, reject){
+        request(azure_jobs, function(err, response, body) {
+            if (err  || response.statusCode != 200) {
                 reject(err);
             } else {
                 data = JSON.parse(body)
@@ -188,6 +284,76 @@ function main() {
             }
         }).catch(function (err) {
             console.log("gcp jobs error ->",err);
+        });
+            packet_pipeline().then(function(data) {
+                for (var i = 0; i < data.length; i++) {
+                    var p_id = data[i].id;
+                    data[i].cloud_id = 3;
+                    data[i].log_link = "https://e2elogs.test.openebs.io/app/kibana#/discover?_g=(refreshInterval:('$$hashKey':'object:2232',display:'10+seconds',pause:!f,section:1,value:10000),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:commit_id,negate:!f,params:(query:'" + data[i].sha + "',type:phrase),type:phrase,value:'" + data[i].sha + "'),query:(match:(commit_id:(query:'" + data[i].sha + "',type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:pipeline_id,negate:!f,params:(query:'"+ p_id + "',type:phrase),type:phrase,value:'"+ p_id + "'),query:(match:(pipeline_id:(query:'"+ p_id + "',type:phrase))))),index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))";
+                    var k = 0;
+                    if (azure_job != "" && azure_job[k] != undefined) {
+                        while(azure_job[k][0].pipeline.id !== p_id) {
+                            k++;
+                            if(azure_job[k] == undefined) {
+                                break;
+                            }
+                        }
+                        if(azure_job[k] != undefined && azure_job[k][0].pipeline.id == p_id) {
+                            data[i].jobs = azure_job[k];
+                            k = 0;
+                        }
+                    }
+                }
+                pipelines[2] = data;
+            }).catch(function (err) {
+                console.log("packet pipeline error ->",err);
+            }).then(function() {
+                var index = 0;
+                if (pipelines[2] != undefined) {
+                    for(var p = 0; p < pipelines[2].length; p++) {
+                        packet_jobs(pipelines[2][p].id).then(function(data) {
+                            packet_job[index] = data;
+                            index++;
+                        });
+                    }
+                }
+            }).catch(function (err) {
+                console.log("packet jobs error ->",err);
+            });
+        azure_pipeline().then(function(data) {
+            for (var i = 0; i < data.length; i++) {
+                var p_id = data[i].id;
+                data[i].cloud_id = 4;
+                data[i].log_link = "https://e2elogs.test.openebs.io/app/kibana#/discover?_g=(refreshInterval:('$$hashKey':'object:2232',display:'10+seconds',pause:!f,section:1,value:10000),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:commit_id,negate:!f,params:(query:'" + data[i].sha + "',type:phrase),type:phrase,value:'" + data[i].sha + "'),query:(match:(commit_id:(query:'" + data[i].sha + "',type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:pipeline_id,negate:!f,params:(query:'"+ p_id + "',type:phrase),type:phrase,value:'"+ p_id + "'),query:(match:(pipeline_id:(query:'"+ p_id + "',type:phrase))))),index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))";
+                var k = 0;
+                if (azure_job != "" && azure_job[k] != undefined) {
+                    while(azure_job[k][0].pipeline.id !== p_id) {
+                        k++;
+                        if(azure_job[k] == undefined) {
+                            break;
+                        }
+                    }
+                    if(azure_job[k] != undefined && azure_job[k][0].pipeline.id == p_id) {
+                        data[i].jobs = azure_job[k];
+                        k = 0;
+                    }
+                }
+            }
+            pipelines[3] = data;
+        }).catch(function (err) {
+            console.log("azure pipeline error ->",err);
+        }).then(function() {
+            var index = 0;
+            if (pipelines[3] != undefined) {
+                for(var p = 0; p < pipelines[3].length; p++) {
+                    azure_jobs(pipelines[3][p].id).then(function(data) {
+                        azure_job[index] = data;
+                        index++;
+                    });
+                }
+            }
+        }).catch(function (err) {
+            console.log("azure jobs error ->",err);
         });
         commits().then(function(data) {
             last_update = calculate(data[0].created_at);
