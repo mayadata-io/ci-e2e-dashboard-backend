@@ -291,15 +291,15 @@ function main() {
                     data[i].cloud_id = 3;
                     data[i].log_link = "https://e2elogs.test.openebs.io/app/kibana#/discover?_g=(refreshInterval:('$$hashKey':'object:2232',display:'10+seconds',pause:!f,section:1,value:10000),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:commit_id,negate:!f,params:(query:'" + data[i].sha + "',type:phrase),type:phrase,value:'" + data[i].sha + "'),query:(match:(commit_id:(query:'" + data[i].sha + "',type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:pipeline_id,negate:!f,params:(query:'"+ p_id + "',type:phrase),type:phrase,value:'"+ p_id + "'),query:(match:(pipeline_id:(query:'"+ p_id + "',type:phrase))))),index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))";
                     var k = 0;
-                    if (azure_job != "" && azure_job[k] != undefined) {
-                        while(azure_job[k][0].pipeline.id !== p_id) {
+                    if (packet_job != "" && packet_job[k] != undefined) {
+                        while(packet_job[k][0].pipeline.id !== p_id) {
                             k++;
-                            if(azure_job[k] == undefined) {
+                            if(packet_job[k] == undefined) {
                                 break;
                             }
                         }
-                        if(azure_job[k] != undefined && azure_job[k][0].pipeline.id == p_id) {
-                            data[i].jobs = azure_job[k];
+                        if(packet_job[k] != undefined && packet_job[k][0].pipeline.id == p_id) {
+                            data[i].jobs = packet_job[k];
                             k = 0;
                         }
                     }
