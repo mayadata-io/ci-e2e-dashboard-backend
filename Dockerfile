@@ -6,6 +6,8 @@ WORKDIR /usr/src/app
 
 ENV NODE_ENV="production"
 
+ENV KEY ""
+
 # Copy dependency definitions
 COPY . /usr/src/app
 
@@ -15,5 +17,10 @@ RUN npm install
 # Expose the port the app runs in
 EXPOSE 3000
 
+ADD launch.sh /
+
+RUN chmod +x /launch.sh
+
 # Serve the app
-CMD ["node", "server.js"]
+
+CMD /launch.sh
