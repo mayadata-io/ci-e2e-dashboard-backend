@@ -72,7 +72,9 @@ function aws_jobs(id) {
                 reject(err);
             } else {
                 data = JSON.parse(body)
-                resolve(data);
+                if(data != "") {
+                    resolve(data);
+                }
             }
         });
     });
@@ -114,7 +116,9 @@ function gcp_jobs(id) {
                 reject(err);
             } else {
                 data = JSON.parse(body)
-                resolve(data);
+                if(data != "") {
+                    resolve(data);
+                }
             }
         });
     });
@@ -156,7 +160,9 @@ function azure_jobs(id) {
                 reject(err);
             } else {
                 data = JSON.parse(body)
-                resolve(data);
+                if(data != "") {
+                    resolve(data);
+                }
             }
         });
     });
