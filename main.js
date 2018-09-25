@@ -7,8 +7,9 @@ var aws = require('./src/aws');
 var gcp = require('./src/gcp');
 var commit = require('./src/commit');
 var azure = require('./src/azure');
+var packet = require('./src/packet');
 var time = require('./src/time-calculate');
-var dashboard = [], pipelines = [] , commits_data = [], last_update, aws_job = [], gcp_job = [], azure_job = [];
+var dashboard = [], pipelines = [] , commits_data = [], last_update, aws_job = [], gcp_job = [], azure_job = [], packet_job = [];
 
 var cloud = [{"cloud_id":1,"cloud_name":"aws"},{"cloud_id":2,"cloud_name":"gce"},{"cloud_id":4,"cloud_name":"azure"}];
 
@@ -119,6 +120,41 @@ function main() {
         }).catch(function (err) {
             console.log("azure jobs error ->",err);
         });
+        packet.packet_pipeline().then(function(data) {
+            for (var i = 0; i < data.length; i++) {
+                var p_id = data[i].id;
+                data[i].cloud_id = 4;
+                data[i].log_link = "https://e2elogs.test.openebs.io/app/kibana#/discover?_g=(refreshInterval:('$$hashKey':'object:2232',display:'10+seconds',pause:!f,section:1,value:10000),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:commit_id,negate:!f,params:(query:'" + data[i].sha + "',type:phrase),type:phrase,value:'" + data[i].sha + "'),query:(match:(commit_id:(query:'" + data[i].sha + "',type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:pipeline_id,negate:!f,params:(query:'"+ p_id + "',type:phrase),type:phrase,value:'"+ p_id + "'),query:(match:(pipeline_id:(query:'"+ p_id + "',type:phrase))))),index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))";
+                var k = 0;
+                if (packet_job != "" && packet_job[k] != undefined) {
+                    while(packet_job[k][0].pipeline.id !== p_id) {
+                        k++;
+                        if(packet_job[k] == undefined) {
+                            break;
+                        }
+                    }
+                    if(packet_job[k] != undefined && packet_job[k][0].pipeline.id == p_id) {
+                        data[i].jobs = packet_job[k];
+                        k = 0;
+                    }
+                }
+            }
+            pipelines[2] = data;
+        }).catch(function (err) {
+            console.log("packet pipeline error ->",err);
+        }).then(function() {
+            var index = 0;
+            if (pipelines[2] != undefined) {
+                for(var p = 0; p < pipelines[2].length; p++) {
+                    packet.packet_jobs(pipelines[2][p].id).then(function(data) {
+                        packet_job[index] = data;
+                        index++;
+                    });
+                }
+            }
+        }).catch(function (err) {
+            console.log("packet jobs error ->",err);
+        });
         commit.commits().then(function(data) {
             last_update = time.calculate(data[0].created_at);
             for (var k = 0; k < data.length; k++) {
@@ -133,7 +169,7 @@ function main() {
         app.get("/", function(req, res)  {
             res.json(dashboard);
         });
-    },20000 );
+    },5000 );
 }
 app.listen(port, function() {
     console.log("server is listening on port:", port);
