@@ -2,184 +2,19 @@ require("moment-duration-format");
 var port = process.env.PORT || 3000;
 var express = require("express"); 
 var app = express();
-var request = require('request');
 var cors = require('cors');
-var moment = require('moment');
-var dateFormat = require('dateformat');
+var aws = require('./src/aws');
+var gcp = require('./src/gcp');
+var commit = require('./src/commit');
+var azure = require('./src/azure');
+var time = require('./src/time-calculate');
 var dashboard = [], pipelines = [] , commits_data = [], last_update, aws_job = [], gcp_job = [], azure_job = [];
-var gitlab_private_token = process.env.token;
 
-var cloud = [{"cloud_id":1,"cloud_name":"aws"},{"cloud_id":2,"cloud_name":"gce"}];
-
-function commits() {
-    var commit = {
-        url: 'https://gitlab.openebs.ci/api/v4/projects/8/repository/commits?ref_name=v0.7-RC1',
-        headers: {'PRIVATE-TOKEN': gitlab_private_token} 
-    };
-    return new Promise(function(resolve, reject){
-        request(commit, function(err, response, body) {
-            if(err  || response.statusCode != 200) {
-                reject(err);
-            } else {
-                var data = [];
-                body = JSON.parse(body);
-                if (body.length > 10) {
-                    for (var i = 0; i < 10; i++) {
-                        data[i] = body[i]
-                    }
-                    resolve(data);
-                } else {
-                    resolve(body);
-                }
-            }
-        });
-    });
-}
-
-function aws_pipeline() {
-    var aws = {  
-        url: 'https://gitlab.openebs.ci/api/v4/projects/7/pipelines',
-        headers: {'PRIVATE-TOKEN': gitlab_private_token}
-    };
-    return new Promise(function(resolve, reject){
-        request(aws, function(err, response, body) {
-            if (err  || response.statusCode != 200) {
-                reject(err);
-            } else {
-                var data = [];
-                body = JSON.parse(body);
-                if (body.length > 10) {
-                    for (var i = 0; i < 10; i++) {
-                        data[i] = body[i]
-                    }
-                    resolve(data);
-                } else {
-                    resolve(body);
-                }
-            }
-        });
-    });
-}
-
-function aws_jobs(id) {
-    var aws_jobs = {
-        url: "https://gitlab.openebs.ci/api/v4/projects/7/pipelines/+"+id+"/jobs",
-        headers: {'PRIVATE-TOKEN': gitlab_private_token}
-    };
-    return new Promise(function(resolve, reject){
-        request(aws_jobs, function(err, response, body) {
-            if (err  || response.statusCode != 200) {
-                reject(err);
-            } else {
-                data = JSON.parse(body)
-                if(data != "") {
-                    resolve(data);
-                }
-            }
-        });
-    });
-}
-
-function gcp_pipeline() {
-    var aws = {  
-        url: 'https://gitlab.openebs.ci/api/v4/projects/9/pipelines',
-        headers: {'PRIVATE-TOKEN': gitlab_private_token}
-    };
-    return new Promise(function(resolve, reject){
-        request(aws, function(err, response, body) {
-            if (err  || response.statusCode != 200) {
-                reject(err);
-            } else {
-                var data = [];
-                body = JSON.parse(body);
-                if (body.length > 10) {
-                    for (var i = 0; i < 10; i++) {
-                        data[i] = body[i]
-                    }
-                    resolve(data);
-                } else {
-                    resolve(body);
-                }
-            }
-        });
-    });
-}
-
-function gcp_jobs(id) {
-    var gcp_jobs = {
-        url: "https://gitlab.openebs.ci/api/v4/projects/9/pipelines/+"+id+"/jobs",
-        headers: {'PRIVATE-TOKEN': gitlab_private_token}
-    };
-    return new Promise(function(resolve, reject){
-        request(gcp_jobs, function(err, response, body) {
-            if (err  || response.statusCode != 200) {
-                reject(err);
-            } else {
-                data = JSON.parse(body)
-                if(data != "") {
-                    resolve(data);
-                }
-            }
-        });
-    });
-}
-
-function azure_pipeline() {
-    var azure = {
-        url: 'https://gitlab.openebs.ci/api/v4/projects/19/pipelines',
-        headers: {'PRIVATE-TOKEN': gitlab_private_token}
-    };
-    return new Promise(function(resolve, reject) {
-        request(azure, function(err, response, body) {
-            if (err || response.statusCode != 200) {
-                reject(err);
-            } else {
-                var data = [];
-                body = JSON.parse(body);
-                if (body.length > 10) {
-                    for (var i = 0; i < 10; i++) {
-                        data[i] = body[i]
-                    }
-                    resolve(data);
-                } else {
-                    resolve(body);
-                }
-            }
-        });
-    });
-}
-
-function azure_jobs(id) {
-    var azure_jobs = {
-        url: "https://gitlab.openebs.ci/api/v4/projects/19/pipelines/+"+id+"/jobs",
-        headers: {'PRIVATE-TOKEN': gitlab_private_token}
-    };
-    return new Promise(function(resolve, reject){
-        request(azure_jobs, function(err, response, body) {
-            if (err  || response.statusCode != 200) {
-                reject(err);
-            } else {
-                data = JSON.parse(body)
-                if(data != "") {
-                    resolve(data);
-                }
-            }
-        });
-    });
-}
-
-function calculate(t1)
-{
-    var t2 = dateFormat((new Date()), "UTC:yyyy-mm-dd,HH:MM:ss");
-    t2 = moment(t2, 'YYYY-M-DD,HH:mm:ss');
-    t1 = moment(t1, 'YYYY-M-DD,HH:mm:ss');
-    t1 = moment.duration((t2.diff(t1, 'second')), "seconds").format("h [Hours] m [minutes]");
-    return t1;
-}
+var cloud = [{"cloud_id":1,"cloud_name":"aws"},{"cloud_id":2,"cloud_name":"gce"},{"cloud_id":4,"cloud_name":"azure"}];
 
 function main() {
     setInterval(function() {
-        aws_pipeline().then(function(data) {
+        aws.aws_pipeline().then(function(data) {
             for (var i = 0; i < data.length; i++) {
                 var p_id = data[i].id;
                 data[i].cloud_id = 1;
@@ -205,7 +40,7 @@ function main() {
             var index = 0;
             if (pipelines[0] != undefined) {
                 for(var p = 0; p < pipelines[0].length; p++) {
-                    aws_jobs(pipelines[0][p].id).then(function(data) {
+                    aws.aws_jobs(pipelines[0][p].id).then(function(data) {
                         aws_job[index] = data;
                         index++;
                     });
@@ -214,7 +49,7 @@ function main() {
         }).catch(function (err) {
             console.log("aws jobs error ->",err);
         });
-        gcp_pipeline().then(function(data) {
+        gcp.gcp_pipeline().then(function(data) {
             for (var j = 0; j < data.length; j++) {
                 var p_id = data[j].id;
                 data[j].cloud_id = 2;
@@ -240,7 +75,7 @@ function main() {
             var index = 0;
             if (pipelines[1] != undefined) {
                 for(var p = 0; p < pipelines[1].length; p++) {
-                    gcp_jobs(pipelines[1][p].id).then(function(data) {
+                    gcp.gcp_jobs(pipelines[1][p].id).then(function(data) {
                         gcp_job[index] = data;
                         index++;
                     });
@@ -249,7 +84,7 @@ function main() {
         }).catch(function (err) {
             console.log("gcp jobs error ->",err);
         });
-        azure_pipeline().then(function(data) {
+        azure.azure_pipeline().then(function(data) {
             for (var i = 0; i < data.length; i++) {
                 var p_id = data[i].id;
                 data[i].cloud_id = 4;
@@ -275,7 +110,7 @@ function main() {
             var index = 0;
             if (pipelines[3] != undefined) {
                 for(var p = 0; p < pipelines[3].length; p++) {
-                    azure_jobs(pipelines[3][p].id).then(function(data) {
+                    azure.azure_jobs(pipelines[3][p].id).then(function(data) {
                         azure_job[index] = data;
                         index++;
                     });
@@ -284,8 +119,8 @@ function main() {
         }).catch(function (err) {
             console.log("azure jobs error ->",err);
         });
-        commits().then(function(data) {
-            last_update = calculate(data[0].created_at);
+        commit.commits().then(function(data) {
+            last_update = time.calculate(data[0].created_at);
             for (var k = 0; k < data.length; k++) {
                 data[k].project_name = "v0.7-RC1";
                 data[k].commit_url = "https://github.com/openebs/e2e-infrastructure/commit/" + data[k].id;
