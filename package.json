@@ -1,8 +1,8 @@
 {
   "name": "node-api",
-  "main": "server.js",
+  "main": "main.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node main.js"
   },
   "author": "chandan kumar",
   "license": "MIT",
