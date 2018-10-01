@@ -5,7 +5,7 @@ var gitlab_private_token = process.env.token;
 module.exports = {
     aws_pipeline:function() {
         var aws = {  
-            url: 'https://gitlab.openebs.ci/api/v4/projects/7/pipelines',
+            url: 'https://gitlab.openebs.ci/api/v4/projects/7/pipelines?ref=master',
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){

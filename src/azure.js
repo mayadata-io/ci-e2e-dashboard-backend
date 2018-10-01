@@ -4,7 +4,7 @@ var gitlab_private_token = process.env.token;
 module.exports = {
     azure_pipeline:function() {
         var azure = {
-            url: 'https://gitlab.openebs.ci/api/v4/projects/19/pipelines',
+            url: 'https://gitlab.openebs.ci/api/v4/projects/19/pipelines?ref=master',
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject) {
