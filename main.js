@@ -9,9 +9,10 @@ var commit = require('./src/commit');
 var azure = require('./src/azure');
 var packet = require('./src/packet');
 var time = require('./src/time-calculate');
+var log_link = require('./src/kibana_log');
 var dashboard = [], pipelines = [] , commits_data = [], last_update, aws_job = [], gcp_job = [], azure_job = [], packet_job = [];
 
-var cloud = [{"cloud_id":1,"cloud_name":"aws"},{"cloud_id":2,"cloud_name":"gce"},{"cloud_id":4,"cloud_name":"azure"}];
+var cloud = [{"cloud_id":1,"cloud_name":"aws"},{"cloud_id":2,"cloud_name":"gce"},{"cloud_id":3,"cloud_name":"packet"},{"cloud_id":4,"cloud_name":"azure"}];
 
 function main() {
     setInterval(function() {
@@ -19,7 +20,6 @@ function main() {
             for (var i = 0; i < data.length; i++) {
                 var p_id = data[i].id;
                 data[i].cloud_id = 1;
-                data[i].log_link = "https://e2elogs.test.openebs.io/app/kibana#/discover?_g=(refreshInterval:('$$hashKey':'object:2232',display:'10+seconds',pause:!f,section:1,value:10000),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:commit_id,negate:!f,params:(query:'" + data[i].sha + "',type:phrase),type:phrase,value:'" + data[i].sha + "'),query:(match:(commit_id:(query:'" + data[i].sha + "',type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:pipeline_id,negate:!f,params:(query:'"+ p_id + "',type:phrase),type:phrase,value:'"+ p_id + "'),query:(match:(pipeline_id:(query:'"+ p_id + "',type:phrase))))),index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))";
                 var k = 0;
                 if (aws_job != "" && aws_job[k] != undefined) {
                     while(aws_job[k][0].pipeline.id !== p_id) {
@@ -31,6 +31,7 @@ function main() {
                     if(aws_job[k] != undefined && aws_job[k][0].pipeline.id == p_id) {
                         data[i].jobs = aws_job[k];
                         k = 0;
+                        data[i].log_link = log_link.kibana_log(data[i].sha, p_id, data[i]);
                     }
                 }
             }
@@ -54,7 +55,6 @@ function main() {
             for (var j = 0; j < data.length; j++) {
                 var p_id = data[j].id;
                 data[j].cloud_id = 2;
-                data[j].log_link = "https://e2elogs.test.openebs.io/app/kibana#/discover?_g=(refreshInterval:('$$hashKey':'object:2232',display:'10+seconds',pause:!f,section:1,value:10000),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:commit_id,negate:!f,params:(query:'" + data[j].sha + "',type:phrase),type:phrase,value:'" + data[j].sha + "'),query:(match:(commit_id:(query:'" + data[j].sha + "',type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:pipeline_id,negate:!f,params:(query:'"+ p_id + "',type:phrase),type:phrase,value:'"+ p_id + "'),query:(match:(pipeline_id:(query:'"+ p_id + "',type:phrase))))),index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))";
                 var k = 0;
                 if (gcp_job != "" && gcp_job[k] != undefined) {
                     while(gcp_job[k][0].pipeline.id !== p_id) {
@@ -66,6 +66,7 @@ function main() {
                     if(gcp_job[k] != undefined && gcp_job[k][0].pipeline.id == p_id) {
                         data[j].jobs = gcp_job[k];
                         k = 0;
+                        data[j].log_link = log_link.kibana_log(data[j].sha, p_id, data[j]);
                     }
                 }
             }
@@ -89,7 +90,6 @@ function main() {
             for (var i = 0; i < data.length; i++) {
                 var p_id = data[i].id;
                 data[i].cloud_id = 4;
-                data[i].log_link = "https://e2elogs.test.openebs.io/app/kibana#/discover?_g=(refreshInterval:('$$hashKey':'object:2232',display:'10+seconds',pause:!f,section:1,value:10000),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:commit_id,negate:!f,params:(query:'" + data[i].sha + "',type:phrase),type:phrase,value:'" + data[i].sha + "'),query:(match:(commit_id:(query:'" + data[i].sha + "',type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:pipeline_id,negate:!f,params:(query:'"+ p_id + "',type:phrase),type:phrase,value:'"+ p_id + "'),query:(match:(pipeline_id:(query:'"+ p_id + "',type:phrase))))),index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))";
                 var k = 0;
                 if (azure_job != "" && azure_job[k] != undefined) {
                     while(azure_job[k][0].pipeline.id !== p_id) {
@@ -101,6 +101,7 @@ function main() {
                     if(azure_job[k] != undefined && azure_job[k][0].pipeline.id == p_id) {
                         data[i].jobs = azure_job[k];
                         k = 0;
+                        data[i].log_link = log_link.kibana_log(data[i].sha, p_id, data[i]);
                     }
                 }
             }
@@ -123,8 +124,7 @@ function main() {
         packet.packet_pipeline().then(function(data) {
             for (var i = 0; i < data.length; i++) {
                 var p_id = data[i].id;
-                data[i].cloud_id = 4;
-                data[i].log_link = "https://e2elogs.test.openebs.io/app/kibana#/discover?_g=(refreshInterval:('$$hashKey':'object:2232',display:'10+seconds',pause:!f,section:1,value:10000),time:(from:now-1h,mode:quick,to:now))&_a=(columns:!(_source),filters:!(('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:commit_id,negate:!f,params:(query:'" + data[i].sha + "',type:phrase),type:phrase,value:'" + data[i].sha + "'),query:(match:(commit_id:(query:'" + data[i].sha + "',type:phrase)))),('$state':(store:appState),meta:(alias:!n,disabled:!f,index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',key:pipeline_id,negate:!f,params:(query:'"+ p_id + "',type:phrase),type:phrase,value:'"+ p_id + "'),query:(match:(pipeline_id:(query:'"+ p_id + "',type:phrase))))),index:'215dd610-a155-11e8-8b91-cb4b4edefe7f',interval:auto,query:(language:lucene,query:''),sort:!('@timestamp',desc))";
+                data[i].cloud_id = 3;
                 var k = 0;
                 if (packet_job != "" && packet_job[k] != undefined) {
                     while(packet_job[k][0].pipeline.id !== p_id) {
@@ -136,6 +136,7 @@ function main() {
                     if(packet_job[k] != undefined && packet_job[k][0].pipeline.id == p_id) {
                         data[i].jobs = packet_job[k];
                         k = 0;
+                        data[i].log_link = log_link.kibana_log(data[i].sha, p_id, data[i]);
                     }
                 }
             }
