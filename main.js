@@ -8,9 +8,10 @@ var gcp = require('./src/gcp');
 var commit = require('./src/commit');
 var azure = require('./src/azure');
 var packet = require('./src/packet');
+var gke = require('./src/gke');
 var time = require('./src/time-calculate');
 var log_link = require('./src/kibana_log');
-var dashboard = [], pipelines = [] , commits_data = [], last_update, aws_job = [], gcp_job = [], azure_job = [], packet_job = [];
+var dashboard = [], pipelines = [] , commits_data = [], last_update, aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [];
 
 var cloud = [{"cloud_id":1,"cloud_name":"aws"},{"cloud_id":2,"cloud_name":"gce"},{"cloud_id":3,"cloud_name":"packet"},{"cloud_id":4,"cloud_name":"azure"}];
 
@@ -156,6 +157,41 @@ function main() {
         }).catch(function (err) {
             console.log("packet jobs error ->",err);
         });
+        gke.gke_pipeline().then(function(data) {
+            for (var i = 0; i < data.length; i++) {
+                var p_id = data[i].id;
+                data[i].cloud_id = 3;
+                var k = 0;
+                if (gke_job != "" && gke_job[k] != undefined) {
+                    while(gke_job[k][0].pipeline.id !== p_id) {
+                        k++;
+                        if(gke_job[k] == undefined) {
+                            break;
+                        }
+                    }
+                    if(gke_job[k] != undefined && gke_job[k][0].pipeline.id == p_id) {
+                        data[i].jobs = gke_job[k];
+                        k = 0;
+                        data[i].log_link = log_link.kibana_log(data[i].sha, p_id, data[i]);
+                    }
+                }
+            }
+            pipelines[4] = data;
+        }).catch(function (err) {
+            console.log("gke pipeline error ->",err);
+        }).then(function() {
+            var index = 0;
+            if (pipelines[4] != undefined) {
+                for(var p = 0; p < pipelines[4].length; p++) {
+                    gke.gke_jobs(pipelines[4][p].id).then(function(data) {
+                        gke_job[index] = data;
+                        index++;
+                    });
+                }
+            }
+        }).catch(function (err) {
+            console.log("gke jobs error ->",err);
+        });
         commit.commits().then(function(data) {
             last_update = time.calculate(data[0].created_at);
             for (var k = 0; k < data.length; k++) {
@@ -170,7 +206,7 @@ function main() {
         app.get("/", function(req, res)  {
             res.json(dashboard);
         });
-    },5000 );
+    },20000 );
 }
 app.listen(port, function() {
     console.log("server is listening on port:", port);
