@@ -2,14 +2,14 @@ var request = require('request');
 var gitlab_private_token = process.env.token;
 
 module.exports = {
-    gke_pipeline:function() {
-        var gke = {  
-            url: 'https://gitlab.openebs.ci/api/v4/projects/24/pipelines',
+    aks_pipeline:function() {
+        var azure = {
+            url: 'https://gitlab.openebs.ci/api/v4/projects/19/pipelines?ref=master',
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
-        return new Promise(function(resolve, reject){
-            request(gke, function(err, response, body) {
-                if (err  || response.statusCode != 200) {
+        return new Promise(function(resolve, reject) {
+            request(azure, function(err, response, body) {
+                if (err || response.statusCode != 200) {
                     reject(err);
                 } else {
                     var data = [];
@@ -27,13 +27,13 @@ module.exports = {
         });
     },
 
-    gke_jobs:function(id) {
-        var gke_jobs = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/24/pipelines/+"+id+"/jobs?per_page=50",
+    aks_jobs:function(id) {
+        var azure_jobs = {
+            url: "https://gitlab.openebs.ci/api/v4/projects/19/pipelines/+"+id+"/jobs?per_page=50",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
-            request(gke_jobs, function(err, response, body) {
+            request(azure_jobs, function(err, response, body) {
                 if (err  || response.statusCode != 200) {
                     reject(err);
                 } else {
@@ -45,4 +45,4 @@ module.exports = {
             });
         });
     }
-}
+};

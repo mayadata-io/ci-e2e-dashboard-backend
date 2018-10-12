@@ -15,14 +15,14 @@ module.exports = {
                 } else {
                     var data = [];
                     body = JSON.parse(body);
-                    if (body.length > 10) {
-                        for (var i = 0; i < 10; i++) {
-                            data[i] = body[i]
-                        }
-                        resolve(data);
-                    } else {
+                    // if (body.length > 10) {
+                    //     for (var i = 0; i < 10; i++) {
+                    //         data[i] = body[i]
+                    //     }
+                    //     resolve(data);
+                    // } else {
                         resolve(body);
-                    }
+                    // }
                 }
             });
         });
@@ -30,7 +30,7 @@ module.exports = {
 
     aws_jobs:function(id) {
         var aws_jobs = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/7/pipelines/+"+id+"/jobs",
+            url: "https://gitlab.openebs.ci/api/v4/projects/7/pipelines/+"+id+"/jobs?per_page=50",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
