@@ -3,13 +3,13 @@ var gitlab_private_token = process.env.token;
 
 
 module.exports = {
-    aws_pipeline:function() {
-        var aws = {  
-            url: 'https://gitlab.openebs.ci/api/v4/projects/7/pipelines?ref=master',
+    eks_pipeline:function() {
+        var eks = {  
+            url: 'https://gitlab.openebs.ci/api/v4/projects/27/pipelines?ref=master',
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
-            request(aws, function(err, response, body) {
+            request(eks, function(err, response, body) {
                 if (err  || response.statusCode != 200) {
                     reject(err);
                 } else {
@@ -28,13 +28,13 @@ module.exports = {
         });
     },
 
-    aws_jobs:function(id) {
-        var aws_jobs = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/7/pipelines/+"+id+"/jobs?per_page=50",
+    eks_jobs:function(id) {
+        var eks_job = {
+            url: "https://gitlab.openebs.ci/api/v4/projects/27/pipelines/+"+id+"/jobs?per_page=50",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
-            request(aws_jobs, function(err, response, body) {
+            request(eks_job, function(err, response, body) {
                 if (err  || response.statusCode != 200) {
                     reject(err);
                 } else {
