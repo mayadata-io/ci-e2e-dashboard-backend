@@ -16,6 +16,7 @@
     "express": "~4.16.1",
     "moment": "^2.22.2",
     "moment-duration-format": "^2.2.2",
+    "nodemon": "^1.18.4",
     "request": "^2.88.0"
   }
 }

@@ -5,7 +5,7 @@ var gitlab_private_token = process.env.token;
 module.exports = {
     cstor_pipeline:function() {
         var cstor = {  
-            url: 'https://gitlab.openebs.ci/api/v4/projects/26/pipelines',
+            url: 'https://gitlab.openebs.ci/api/v4/projects/26/pipelines?ref=master',
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -22,7 +22,7 @@ module.exports = {
 
     maya_pipeline:function() {
         var maya = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/25/pipelines",
+            url: "https://gitlab.openebs.ci/api/v4/projects/25/pipelines?ref=master",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -41,7 +41,7 @@ module.exports = {
 
     jiva_pipeline:function() {
         var jiva = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/22/pipelines",
+            url: "https://gitlab.openebs.ci/api/v4/projects/22/pipelines?ref=master",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
