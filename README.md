@@ -1,6 +1,6 @@
 # Backend server for openebs ci-dashboard 
 
-## http://openebs.ci
+## https://openebs.ci
 
 ### Install dependencies
 
