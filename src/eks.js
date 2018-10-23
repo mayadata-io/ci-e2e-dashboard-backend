@@ -15,7 +15,14 @@ module.exports = {
                 } else {
                     var data = [];
                     body = JSON.parse(body);
-                    resolve(body);
+                    // if (body.length > 10) {
+                    //     for (var i = 0; i < 10; i++) {
+                    //         data[i] = body[i]
+                    //     }
+                    //     resolve(data);
+                    // } else {
+                        resolve(body);
+                    // }
                 }
             });
         });
