@@ -13,7 +13,7 @@ var gke = require('./src/gke');
 var time = require('./src/time-calculate');
 var log_link = require('./src/kibana_log');
 var build = require('./src/build');
-var dashboard = [], pipelines = [] , commits_data = [], aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [], eks_job = [], builddata = [];
+var dashboard = [], pipelines = [] , commits_data = [], aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [], eks_job = [], temp = [], builddata = [], cstor_job = [], maya_job = [], jiva_job = [];
 
 var cloud = [{"cloud_id":1,"cloud_name":"GKE"},{"cloud_id":2,"cloud_name":"AKS"},{"cloud_id":3,"cloud_name":"EKS"},{"cloud_id":4,"cloud_name":"Packet"},{"cloud_id":5,"cloud_name":"GCP"},{"cloud_id":6,"cloud_name":"AWS"}];
 
@@ -246,78 +246,151 @@ function main() {
     });
 // ------------  AWS data End  ------------------------
 
-// ------------  Commit data Start  ------------------------
-    var store1 = [], data3 = [], data4 = [];
-    commit.cstor().then(function(cstordata) {
-        for(var i=0; i< cstordata.length; i++) {
-            cstordata[i].name = "cstor";
-            cstordata[i].updated = time.calculate(cstordata[i].created_at);
-            cstordata[i].commit_url = "https://github.com/openebs/cstor/commit/" + cstordata[i].id;
-        }
-        commit.maya().then(function(mayadata) {
-            for(var i=0; i< mayadata.length; i++) {
-                mayadata[i].name = "maya";
-                mayadata[i].updated = time.calculate(mayadata[i].created_at);
-                mayadata[i].commit_url = "https://github.com/openebs/maya/commit/" + mayadata[i].id;
-            }
-            store1 = cstordata.concat(mayadata)
-            commit.jiva().then(function(jivadata) {
-                for(var i=0; i< jivadata.length; i++) {
-                    jivadata[i].name = "jiva";
-                    jivadata[i].updated = time.calculate(jivadata[i].created_at);
-                    jivadata[i].commit_url = "https://github.com/openebs/jiva/commit/" + jivadata[i].id;
-                }
-                data3 = store1.concat(jivadata);
-                // Sorting data using committed_date
-                if (data3 != undefined) {
-                    data3.sort(function(a, b) {
-                        a = new Date(a.committed_date);
-                        b = new Date(b.committed_date);
-                        return a>b ? -1 : a<b ? 1 : 0;
-                    });
-                }
-                for (var i = 0; i < 20; i++) {
-                    data4[i] = data3[i]
-                }
-                //sorting end
-            })
-        });
-        commits_data = data4;
-    }).catch(function (err) {
-        console.log("commits error ->",err);
-    });
-// ------------  Commit data End  ------------------------
+// ------------ build data ---------------------------
 
-// ------------  Build data Start  ------------------------
-    build.cstor_pipeline().then(function(cstordata) {
-        var store = [], data = [], data2 = [];
-        build.maya_pipeline().then(function(mayadata) {
-            store = cstordata.concat(mayadata)
-            build.jiva_pipeline().then(function(jivadata) {
-                data = store.concat(jivadata);
-                // Sorting data by their id
-                if (jivadata != undefined) {
-                    data.sort(sort_by('id', true, parseInt));
-                    function sort_by(field, reverse, primer) {
-                        var key = primer ? 
-                            function(x) {return primer(x[field])} : 
-                            function(x) {return x[field]};
-                        reverse = !reverse ? 1 : -1;
-                        return function (a, b) {
-                            return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
-                        } 
-                    }
+// ----------------- build cstor ------------------------
+// build.cstor_pipeline().then(function(data) {
+//     for (var i = 0; i < data.length; i++) {
+//         data[i].name = "cstor";
+//         var p_id = data[i].id;
+//         var k = 0;
+//         if (cstor_job != "" && cstor_job[k] != undefined) {
+//             while(cstor_job[k][0].pipeline.id !== p_id) {
+//                 k++;
+//                 if(cstor_job[k] == undefined) {
+//                     break;
+//                 }
+//             }
+//             if(cstor_job[k] != undefined && cstor_job[k][0].pipeline.id == p_id) {
+//                 data[i].jobs = cstor_job[k];
+//                 k = 0;
+//             }
+//         }
+
+//     }
+//     builddata[0] = data;
+// }).catch(function (err) {
+//     console.log("cstor build pipeline error ->",err);
+// }).then(function() {
+//     var index = 0;
+//     if (builddata[0] != undefined) {
+//         for(var p = 0; p < builddata[0].length; p++) {
+//             build.cstor_jobs(builddata[0][p].id).then(function(data) {
+//                 cstor_job[index] = data;
+//                 index++;
+//             });
+//         }
+//     }
+// }).catch(function (err) {
+//     console.log("cstor build pipeline jobs error ->",err);
+// });
+
+// ------------------------- build maya ------------------------------
+build.maya_pipeline().then(function(data) {
+    for (var i = 0; i < data.length; i++) {
+        data[i].name = "maya";
+        data[i].commit_url = "https://github.com/openebs/maya/commit/"+data[i].sha;
+        var p_id = data[i].id;
+        var k = 0;
+        if (maya_job != "" && maya_job[k] != undefined) {
+            while(maya_job[k][0].pipeline.id !== p_id) {
+                k++;
+                if(maya_job[k] == undefined) {
+                    break;
                 }
-                for (var i = 0; i < 20; i++) {
-                    data2[i] = data[i]
+            }
+            if(maya_job[k] != undefined && maya_job[k][0].pipeline.id == p_id) {
+                data[i].jobs = maya_job[k];
+                // data[i].updated = time.calculate(maya_job[0]);
+                k = 0;
+            }
+        }
+
+    }
+    // if (builddata[0] != undefined) {
+        // builddata[1] = data.concat(builddata[0]);
+        builddata[0] = data;
+    // }
+}).catch(function (err) {
+    console.log("maya build pipeline error ->",err);
+}).then(function() {
+    var index = 0;
+    if (builddata[0] != undefined) {
+        for(var p = 0; p < builddata[0].length; p++) {
+            build.maya_jobs(builddata[0][p].id).then(function(data) {
+                data[0]['updated'] = time.calculate(data[0]);
+                maya_job[index] = data;
+                index++;
+            });
+        }
+    }
+}).catch(function (err) {
+    console.log("maya build pipeline jobs error ->",err);
+});
+
+// ------------------------------ build jiva ---------------------------
+build.jiva_pipeline().then(function(data) {
+    for (var i = 0; i < data.length; i++) {
+        data[i].name = "jiva";
+        data[i].commit_url = "https://github.com/openebs/jiva/commit/"+data[i].sha;
+        var p_id = data[i].id;
+        var k = 0;
+        if (jiva_job != "" && jiva_job[k] != undefined) {
+            while(jiva_job[k][0].pipeline.id !== p_id) {
+                k++;
+                if(jiva_job[k] == undefined) {
+                    break;
                 }
-                //sorting end
-            })
-        });
-        builddata = data2;
-    });
+            }
+            if(jiva_job[k] != undefined && jiva_job[k][0].pipeline.id == p_id) {
+                data[i].jobs = jiva_job[k];
+                // data[i].updated = time.calculate(jiva_job[0]);
+                k = 0;
+            }
+        }
+
+    }
+    if (builddata[0] != undefined) {
+        temp = builddata[0].concat(data);
+        builddata[1] = data;
+    } 
+}).catch(function (err) {
+    console.log("jiva build pipeline error ->",err);
+}).then(function() {
+    var index = 0;
+    if (builddata[1] != undefined) {
+        for(var p = 0; p < builddata[1].length; p++) {
+            build.jiva_jobs(builddata[1][p].id).then(function(data) {
+                data[0]['updated'] = time.calculate(data[0]);
+                // time.calculate(data[0]);
+                jiva_job[index] = data;
+                index++;
+            });
+        }
+    }
+}).catch(function (err) {
+    console.log("jiva build pipeline jobs error ->",err);
+});
+//  Sorting data by their id
+if (temp != undefined) {
+    temp.sort(sort_by('id', true, parseInt));
+    function sort_by(field, reverse, primer) {
+        var key = primer ? 
+            function(x) {return primer(x[field])} : 
+            function(x) {return x[field]};
+        reverse = !reverse ? 1 : -1;
+        return function (a, b) {
+            return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+        } 
+    }
+}
+// for (var i = 0; i < 20; i++) {
+//     data2[i] = data[i]
+// }
+//sorting end
+
 // ------------  Build data End  ------------------------
-    dashboard = { "dashboard" : { "pipelines": pipelines , "build": builddata, "commits" : commits_data, "cloud" : cloud }}; 
+    dashboard = { "dashboard" : { "pipelines": pipelines , "build": temp, "cloud" : cloud }}; 
     app.get("/", function(req, res)  {
         res.json(dashboard);
     });
@@ -327,7 +400,7 @@ main();
 
 setInterval(function() {
     main();
-},30000 );
+},60000 );
 
 app.listen(port, function() {
     console.log("server is listening on port:", port);
