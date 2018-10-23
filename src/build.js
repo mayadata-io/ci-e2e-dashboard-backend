@@ -19,10 +19,26 @@ module.exports = {
             });
         });
     },
+    cstor_jobs:function(id) {
+        var cstor_job = {  
+            url: "https://gitlab.openebs.ci/api/v4/projects/26/pipelines/+"+id+"/jobs?per_page=50",
+            headers: {'PRIVATE-TOKEN': gitlab_private_token}
+        };
+        return new Promise(function(resolve, reject){
+            request(cstor_job, function(err, response, body) {
+                if (err  || response.statusCode != 200) {
+                    reject(err);
+                } else {
+                    body = JSON.parse(body);
+                    resolve(body);
+                }
+            });
+        });
+    },
 
     maya_pipeline:function() {
         var maya = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/25/pipelines?ref=master",
+            url: "https://gitlab.openebs.ci/api/v4/projects/31/pipelines?ref=master",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -39,9 +55,28 @@ module.exports = {
         });
     },
 
+    maya_jobs:function(id) {
+        var maya_job = {
+            url: "https://gitlab.openebs.ci/api/v4/projects/31/pipelines/+"+id+"/jobs?per_page=50",
+            headers: {'PRIVATE-TOKEN': gitlab_private_token}
+        };
+        return new Promise(function(resolve, reject){
+            request(maya_job, function(err, response, body) {
+                if (err  || response.statusCode != 200) {
+                    reject(err);
+                } else {
+                    data = JSON.parse(body)
+                    // if(data != "") {
+                        resolve(data);
+                    // }
+                }
+            });
+        });
+    },
+
     jiva_pipeline:function() {
         var jiva = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/22/pipelines?ref=master",
+            url: "https://gitlab.openebs.ci/api/v4/projects/28/pipelines?ref=master",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -56,5 +91,23 @@ module.exports = {
                 }
             });
         });
-    }
+    },
+    jiva_jobs:function(id) {
+        var jiva = {
+            url: "https://gitlab.openebs.ci/api/v4/projects/28/pipelines/+"+id+"/jobs?per_page=50",
+            headers: {'PRIVATE-TOKEN': gitlab_private_token}
+        };
+        return new Promise(function(resolve, reject){
+            request(jiva, function(err, response, body) {
+                if (err  || response.statusCode != 200) {
+                    reject(err);
+                } else {
+                    data = JSON.parse(body)
+                    // if(data != "") {
+                        resolve(data);
+                    // }
+                }
+            });
+        });
+    },
 };
