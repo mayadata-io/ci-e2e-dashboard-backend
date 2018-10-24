@@ -4,7 +4,7 @@ var gitlab_private_token = process.env.token;
 module.exports = {
     gke_pipeline:function() {
         var gke = {  
-            url: 'https://gitlab.openebs.ci/api/v4/projects/24/pipelines?ref=master',
+            url: 'https://gitlab.openebs.ci/api/v4/projects/24/pipelines',
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
