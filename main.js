@@ -16,7 +16,7 @@ var build = require('./src/build');
 var dashboard = [], pipelines = [] , commits_data = [], aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [], eks_job = [], temp = [], builddata = [], cstor_job = [], maya_job = [], jiva_job = [];
 
 var cloud = [{"cloud_id":1,"cloud_name":"GKE"},{"cloud_id":2,"cloud_name":"AKS"},{"cloud_id":3,"cloud_name":"EKS"},{"cloud_id":4,"cloud_name":"Packet"},{"cloud_id":5,"cloud_name":"GCP"},{"cloud_id":6,"cloud_name":"AWS"}];
-var json ={"id": "dummy_id","sha": "dummy_commit_sha","ref": "dummy","status": "dummy_status","web_url": "dummy json"};
+var json ={"id": "dummy_id","sha": "dummy_commit_sha","ref": "dummy","status": "pending","web_url": "dummy json"};
 function main() {
     // ------------  GKE data Start  ------------------------
     gke.gke_pipeline().then(function(data) {
