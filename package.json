@@ -2,7 +2,8 @@
   "name": "node-api",
   "main": "main.js",
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "start:server": "nodemon main.js"
   },
   "author": "chandan kumar",
   "license": "MIT",

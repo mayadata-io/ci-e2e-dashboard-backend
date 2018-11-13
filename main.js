@@ -17,7 +17,10 @@ var dashboard = [], pipelines = [] , commits_data = [], aws_job = [], gcp_job = 
 
 var cloud = [{"cloud_id":1,"cloud_name":"GKE"},{"cloud_id":2,"cloud_name":"AKS"},{"cloud_id":3,"cloud_name":"EKS"},{"cloud_id":4,"cloud_name":"Packet"},{"cloud_id":5,"cloud_name":"GCP"},{"cloud_id":6,"cloud_name":"AWS"}];
 var json ={"id": "dummy_id","sha": "dummy_commit_sha","ref": "dummy","status": "dummy_status","web_url": "dummy json"};
-function main() {
+
+
+
+function main(branch) {
     // ------------  GKE data Start  ------------------------
     gke.gke_pipeline().then(function(data) {
         if(temp != null) {
@@ -328,7 +331,7 @@ function main() {
 // });
 
 // ------------------------- build maya ------------------------------
-build.maya_pipeline().then(function(data) {
+build.maya_pipeline(branch).then(function(data) {
     for (var i = 0; i < data.length; i++) {
         data[i].name = "maya";
         data[i].commit_url = "https://github.com/openebs/maya/commit/"+data[i].sha;
@@ -371,7 +374,7 @@ build.maya_pipeline().then(function(data) {
 });
 
 // ------------------------------ build jiva ---------------------------
-build.jiva_pipeline().then(function(data) {
+build.jiva_pipeline(branch).then(function(data) {
     for (var i = 0; i < data.length; i++) {
         data[i].name = "jiva";
         data[i].commit_url = "https://github.com/openebs/jiva/commit/"+data[i].sha;
@@ -432,17 +435,17 @@ if (temp != undefined) {
 //sorting end
 
 // ------------  Build data End  ------------------------
-    dashboard = { "dashboard" : { "pipelines": pipelines , "build": temp, "cloud" : cloud }}; 
-    app.get("/", function(req, res)  {
-        res.json(dashboard);
-    });
+ return dashboard = { "dashboard" : { "pipelines": pipelines , "build": temp, "cloud" : cloud }}; 
+
 }
 app.use(cors());
-main();
 
-setInterval(function() {
-    main();
-},60000 );
+// main();
+
+    app.get("/", function(req, res)  {
+        var branch = req.query.branch;
+        res.json(main(branch));
+    });
 
 app.listen(port, function() {
     console.log("server is listening on port:", port);
