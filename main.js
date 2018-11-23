@@ -6,7 +6,6 @@ var cors = require('cors');
 var aws = require('./src/aws');
 var eks = require('./src/eks');
 var gcp = require('./src/gcp');
-var commit = require('./src/commit');
 var aks = require('./src/aks');
 var packet = require('./src/packet');
 var gke = require('./src/gke');
@@ -16,14 +15,16 @@ var build = require('./src/build');
 var dashboard = [], pipelines = [] , commits_data = [], aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [], eks_job = [], temp = [], builddata = [], cstor_job = [], maya_job = [], jiva_job = [];
 
 var cloud = [{"cloud_id":1,"cloud_name":"GKE"},{"cloud_id":2,"cloud_name":"AKS"},{"cloud_id":3,"cloud_name":"EKS"},{"cloud_id":4,"cloud_name":"Packet"},{"cloud_id":5,"cloud_name":"GCP"},{"cloud_id":6,"cloud_name":"AWS"}];
-var json ={"id": "dummy_id","sha": "dummy_commit_sha","ref": "dummy","status": "dummy_status","web_url": "dummy json"};
+var json ={"id": "n/a","sha": "n/a","ref": "n/a","status": "pending","web_url": "n/a"};
 function main() {
     // ------------  GKE data Start  ------------------------
     gke.gke_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if (temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
@@ -67,8 +68,10 @@ function main() {
     aks.aks_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if (temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
@@ -112,8 +115,10 @@ function main() {
     eks.eks_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if (temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
@@ -157,8 +162,10 @@ function main() {
     packet.packet_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if (temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
@@ -202,8 +209,10 @@ function main() {
     gcp.gcp_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if (temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
@@ -247,8 +256,10 @@ function main() {
     aws.aws_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if (temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
