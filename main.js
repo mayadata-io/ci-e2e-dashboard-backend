@@ -22,8 +22,10 @@ function main() {
     gke.gke_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if(temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
@@ -67,8 +69,10 @@ function main() {
     aks.aks_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if(temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
@@ -112,8 +116,10 @@ function main() {
     eks.eks_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if(temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
@@ -157,8 +163,10 @@ function main() {
     packet.packet_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if(temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
@@ -202,8 +210,10 @@ function main() {
     gcp.gcp_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if(temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
@@ -247,8 +257,10 @@ function main() {
     aws.aws_pipeline().then(function(data) {
         if(temp != null) {
             for(var j = 0; j < temp.length; j++) {
-                if(temp[j].status == "running") {
-                    data.unshift(json)
+                if(temp[j].jobs != undefined) {
+                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+                        data.unshift(json)
+                    }
                 }
             }
         }
