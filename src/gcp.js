@@ -4,7 +4,7 @@ var gitlab_private_token = process.env.token;
 module.exports = {
     gcp_pipeline:function() {
         var gcp = {  
-            url: 'https://gitlab.openebs.ci/api/v4/projects/9/pipelines',
+            url: 'https://gitlab.openebs.ci/api/v4/projects/4/pipelines',
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -29,7 +29,7 @@ module.exports = {
 
     gcp_jobs:function(id) {
         var gcp_jobs = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/9/pipelines/+"+id+"/jobs?per_page=50",
+            url: "https://gitlab.openebs.ci/api/v4/projects/4/pipelines/+"+id+"/jobs?per_page=50",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
