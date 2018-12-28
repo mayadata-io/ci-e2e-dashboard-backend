@@ -12,17 +12,17 @@ var gke = require('./src/gke');
 var time = require('./src/time-calculate');
 var log_link = require('./src/kibana_log');
 var build = require('./src/build');
-var dashboard = [], pipelines = [] , aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [], eks_job = [], temp = [], builddata = [], istgt_job = [], zfs_job = [], maya_job = [], jiva_job = [];
+var dashboard = [], pipelines = [] , aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [], eks_job = [], builddata = [], istgt_job = [], zfs_job = [], maya_job = [], jiva_job = [];
 
 var cloud = [{"cloud_id":1,"cloud_name":"GKE"},{"cloud_id":2,"cloud_name":"AKS"},{"cloud_id":3,"cloud_name":"EKS"},{"cloud_id":4,"cloud_name":"Packet"},{"cloud_id":5,"cloud_name":"GCP"},{"cloud_id":6,"cloud_name":"AWS"}];
 var json ={"id": "dummy_id","sha": "dummy_commit_sha","ref": "dummy","status": "pending","web_url": "dummy json"};
 function main() {
     // ------------  GKE data Start  ------------------------
     gke.gke_pipeline().then(function(data) {
-        if(temp != null) {
-            for(var j = 0; j < temp.length; j++) {
-                if(temp[j].jobs != undefined) {
-                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+        if(builddata[0] != null) {
+            for(var j = 0; j < builddata[0].length; j++) {
+                if(builddata[0][j].jobs != undefined) {
+                    if(builddata[0][j].jobs[1].status == "running" || builddata[0][j].jobs[1].status == "pending" || builddata[0][j].jobs[1].status == "created") {
                         data.unshift(json)
                     }
                 }
@@ -66,10 +66,10 @@ function main() {
 
 // ------------  AKS data Start  ------------------------
     aks.aks_pipeline().then(function(data) {
-        if(temp != null) {
-            for(var j = 0; j < temp.length; j++) {
-                if(temp[j].jobs != undefined) {
-                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+        if(builddata[0] != null) {
+            for(var j = 0; j < builddata[0].length; j++) {
+                if(builddata[0][j].jobs != undefined) {
+                    if(builddata[0][j].jobs[1].status == "running" || builddata[0][j].jobs[1].status == "pending" || builddata[0][j].jobs[1].status == "created") {
                         data.unshift(json)
                     }
                 }
@@ -113,10 +113,10 @@ function main() {
 
 // ------------  EKS data End  ------------------------
     eks.eks_pipeline().then(function(data) {
-        if(temp != null) {
-            for(var j = 0; j < temp.length; j++) {
-                if(temp[j].jobs != undefined) {
-                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+        if(builddata[0] != null) {
+            for(var j = 0; j < builddata[0].length; j++) {
+                if(builddata[0][j].jobs != undefined) {
+                    if(builddata[0][j].jobs[1].status == "running" || builddata[0][j].jobs[1].status == "pending" || builddata[0][j].jobs[1].status == "created") {
                         data.unshift(json)
                     }
                 }
@@ -160,10 +160,10 @@ function main() {
 
 // ------------  Packet data Start  ------------------------
     packet.packet_pipeline().then(function(data) {
-        if(temp != null) {
-            for(var j = 0; j < temp.length; j++) {
-                if(temp[j].jobs != undefined) {
-                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+        if(builddata[0] != null) {
+            for(var j = 0; j < builddata[0].length; j++) {
+                if(builddata[0][j].jobs != undefined) {
+                    if(builddata[0][j].jobs[1].status == "running" || builddata[0][j].jobs[1].status == "pending" || builddata[0][j].jobs[1].status == "created") {
                         data.unshift(json)
                     }
                 }
@@ -207,10 +207,10 @@ function main() {
 
 // ------------  GCP data Start  ------------------------
     gcp.gcp_pipeline().then(function(data) {
-        if(temp != null) {
-            for(var j = 0; j < temp.length; j++) {
-                if(temp[j].jobs != undefined) {
-                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+        if(builddata[0] != null) {
+            for(var j = 0; j < builddata[0].length; j++) {
+                if(builddata[0][j].jobs != undefined) {
+                    if(builddata[0][j].jobs[1].status == "running" || builddata[0][j].jobs[1].status == "pending" || builddata[0][j].jobs[1].status == "created") {
                         data.unshift(json)
                     }
                 }
@@ -254,10 +254,10 @@ function main() {
 
 // ------------  AWS data Start  ------------------------
     aws.aws_pipeline().then(function(data) {
-        if(temp != null) {
-            for(var j = 0; j < temp.length; j++) {
-                if(temp[j].jobs != undefined) {
-                    if(temp[j].jobs[1].status == "running" || temp[j].jobs[1].status == "pending" || temp[j].jobs[1].status == "created") {
+        if(builddata[0] != null) {
+            for(var j = 0; j < builddata[0].length; j++) {
+                if(builddata[0][j].jobs != undefined) {
+                    if(builddata[0][j].jobs[1].status == "running" || builddata[0][j].jobs[1].status == "pending" || builddata[0][j].jobs[1].status == "created") {
                         data.unshift(json)
                     }
                 }
