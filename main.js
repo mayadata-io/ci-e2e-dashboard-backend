@@ -6,14 +6,13 @@ var cors = require('cors');
 var aws = require('./src/aws');
 var eks = require('./src/eks');
 var gcp = require('./src/gcp');
-var commit = require('./src/commit');
 var aks = require('./src/aks');
 var packet = require('./src/packet');
 var gke = require('./src/gke');
 var time = require('./src/time-calculate');
 var log_link = require('./src/kibana_log');
 var build = require('./src/build');
-var dashboard = [], pipelines = [] , commits_data = [], aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [], eks_job = [], temp = [], builddata = [], cstor_job = [], maya_job = [], jiva_job = [];
+var dashboard = [], pipelines = [] , aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [], eks_job = [], temp = [], builddata = [], istgt_job = [], zfs_job = [], maya_job = [], jiva_job = [];
 
 var cloud = [{"cloud_id":1,"cloud_name":"GKE"},{"cloud_id":2,"cloud_name":"AKS"},{"cloud_id":3,"cloud_name":"EKS"},{"cloud_id":4,"cloud_name":"Packet"},{"cloud_id":5,"cloud_name":"GCP"},{"cloud_id":6,"cloud_name":"AWS"}];
 var json ={"id": "dummy_id","sha": "dummy_commit_sha","ref": "dummy","status": "pending","web_url": "dummy json"};
@@ -301,45 +300,7 @@ function main() {
 // ------------  AWS data End  ------------------------
 
 // ------------ build data ---------------------------
-
-// ----------------- build cstor ------------------------
-// build.cstor_pipeline().then(function(data) {
-//     for (var i = 0; i < data.length; i++) {
-//         data[i].name = "cstor";
-//         var p_id = data[i].id;
-//         var k = 0;
-//         if (cstor_job != "" && cstor_job[k] != undefined) {
-//             while(cstor_job[k][0].pipeline.id !== p_id) {
-//                 k++;
-//                 if(cstor_job[k] == undefined) {
-//                     break;
-//                 }
-//             }
-//             if(cstor_job[k] != undefined && cstor_job[k][0].pipeline.id == p_id) {
-//                 data[i].jobs = cstor_job[k];
-//                 k = 0;
-//             }
-//         }
-
-//     }
-//     builddata[0] = data;
-// }).catch(function (err) {
-//     console.log("cstor build pipeline error ->",err);
-// }).then(function() {
-//     var index = 0;
-//     if (builddata[0] != undefined) {
-//         for(var p = 0; p < builddata[0].length; p++) {
-//             build.cstor_jobs(builddata[0][p].id).then(function(data) {
-//                 cstor_job[index] = data;
-//                 index++;
-//             });
-//         }
-//     }
-// }).catch(function (err) {
-//     console.log("cstor build pipeline jobs error ->",err);
-// });
-
-// ------------------------- build maya ------------------------------
+// build maya
 build.maya_pipeline().then(function(data) {
     for (var i = 0; i < data.length; i++) {
         data[i].name = "maya";
@@ -355,16 +316,12 @@ build.maya_pipeline().then(function(data) {
             }
             if(maya_job[k] != undefined && maya_job[k][0].pipeline.id == p_id) {
                 data[i].jobs = maya_job[k];
-                // data[i].updated = time.calculate(maya_job[0]);
                 k = 0;
             }
         }
 
     }
-    // if (builddata[0] != undefined) {
-        // builddata[1] = data.concat(builddata[0]);
-        builddata[0] = data;
-    // }
+    builddata[0] = data;
 }).catch(function (err) {
     console.log("maya build pipeline error ->",err);
 }).then(function() {
@@ -398,14 +355,13 @@ build.jiva_pipeline().then(function(data) {
             }
             if(jiva_job[k] != undefined && jiva_job[k][0].pipeline.id == p_id) {
                 data[i].jobs = jiva_job[k];
-                // data[i].updated = time.calculate(jiva_job[0]);
                 k = 0;
             }
         }
-
     }
     if (builddata[0] != undefined) {
-        temp = builddata[0].concat(data);
+        builddata[0] = builddata[0].concat(data);
+        // console.log(builddata[0])
         builddata[1] = data;
     } 
 }).catch(function (err) {
@@ -416,7 +372,6 @@ build.jiva_pipeline().then(function(data) {
         for(var p = 0; p < builddata[1].length; p++) {
             build.jiva_jobs(builddata[1][p].id).then(function(data) {
                 data[0]['updated'] = time.calculate(data[0]);
-                // time.calculate(data[0]);
                 jiva_job[index] = data;
                 index++;
             });
@@ -425,9 +380,90 @@ build.jiva_pipeline().then(function(data) {
 }).catch(function (err) {
     console.log("jiva build pipeline jobs error ->",err);
 });
+// ------------------------------ build zfs ---------------------------
+build.zfs_pipeline().then(function(data) {
+    for (var i = 0; i < data.length; i++) {
+        data[i].name = "zfs";
+        data[i].commit_url = "https://github.com/openebs/zfs/commit/"+data[i].sha;
+        var p_id = data[i].id;
+        var k = 0;
+        if (zfs_job != "" && zfs_job[k] != undefined) {
+            while(zfs_job[k][0].pipeline.id !== p_id) {
+                k++;
+                if(zfs_job[k] == undefined) {
+                    break;
+                }
+            }
+            if(zfs_job[k] != undefined && zfs_job[k][0].pipeline.id == p_id) {
+                data[i].jobs = zfs_job[k];
+                k = 0;
+            }
+        }
+    }
+    if (builddata[0] != undefined) {
+        builddata[0] = builddata[0].concat(data);
+        builddata[2] = data;
+    } 
+}).catch(function (err) {
+    console.log("zfs build pipeline error ->",err);
+}).then(function() {
+    var index = 0;
+    if (builddata[2] != undefined) {
+        for(var p = 0; p < builddata[2].length; p++) {
+            build.zfs_jobs(builddata[2][p].id).then(function(data) {
+                data[0]['updated'] = time.calculate(data[0]);
+                zfs_job[index] = data;
+                index++;
+            });
+        }
+    }
+}).catch(function (err) {
+    console.log("zfs build pipeline jobs error ->",err);
+});
+
+// ------------------------------ build istgt ---------------------------
+build.istgt_pipeline().then(function(data) {
+    for (var i = 0; i < data.length; i++) {
+        data[i].name = "istgt";
+        data[i].commit_url = "https://github.com/openebs/istgt/commit/"+data[i].sha;
+        var p_id = data[i].id;
+        var k = 0;
+        if (istgt_job != "" && istgt_job[k] != undefined) {
+            while(istgt_job[k][0].pipeline.id !== p_id) {
+                k++;
+                if(istgt_job[k] == undefined) {
+                    break;
+                }
+            }
+            if(istgt_job[k] != undefined && istgt_job[k][0].pipeline.id == p_id) {
+                data[i].jobs = istgt_job[k];
+                k = 0;
+            }
+        }
+    }
+    if (builddata[0] != undefined) {
+        builddata[0] = builddata[0].concat(data);
+        builddata[3] = data;
+    } 
+}).catch(function (err) {
+    console.log("istgt build pipeline error ->",err);
+}).then(function() {
+    var index = 0;
+    if (builddata[3] != undefined) {
+        for(var p = 0; p < builddata[3].length; p++) {
+            build.istgt_jobs(builddata[3][p].id).then(function(data) {
+                data[0]['updated'] = time.calculate(data[0]);
+                istgt_job[index] = data;
+                index++;
+            });
+        }
+    }
+}).catch(function (err) {
+    console.log("istgt build pipeline jobs error ->",err);
+});
 //  Sorting data by their id
-if (temp != undefined) {
-    temp.sort(sort_by('id', true, parseInt));
+if (builddata[0] != undefined) {
+    builddata[0].sort(sort_by('id', true, parseInt));
     function sort_by(field, reverse, primer) {
         var key = primer ? 
             function(x) {return primer(x[field])} : 
@@ -444,7 +480,7 @@ if (temp != undefined) {
 //sorting end
 
 // ------------  Build data End  ------------------------
-    dashboard = { "dashboard" : { "pipelines": pipelines , "build": temp, "cloud" : cloud }}; 
+    dashboard = { "dashboard" : { "build": builddata[0], "cloud" : cloud }}; 
     app.get("/", function(req, res)  {
         res.json(dashboard);
     });
