@@ -480,7 +480,7 @@ if (builddata[0] != undefined) {
 //sorting end
 
 // ------------  Build data End  ------------------------
-    dashboard = { "dashboard" : { "build": builddata[0], "cloud" : cloud }}; 
+    dashboard = { "dashboard" : { "pipelines": pipelines , "build": builddata[0], "cloud" : cloud }}; 
     app.get("/", function(req, res)  {
         res.json(dashboard);
     });
