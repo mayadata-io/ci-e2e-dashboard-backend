@@ -12,7 +12,7 @@ var gke = require('./src/gke');
 var time = require('./src/time-calculate');
 var log_link = require('./src/kibana_log');
 var build = require('./src/build');
-var dashboard = [], pipelines = [] , aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [], eks_job = [], builddata = [], istgt_job = [], zfs_job = [], maya_job = [], jiva_job = [];
+var dashboard = [], pipelines = [] , aws_job = [], gcp_job = [], azure_job = [], packet_job = [], gke_job = [], eks_job = [], builddata = [], istgt_job = [], cstor_job = [], maya_job = [], jiva_job = [], temp = [];
 
 var cloud = [{"cloud_id":1,"cloud_name":"GKE"},{"cloud_id":2,"cloud_name":"AKS"},{"cloud_id":3,"cloud_name":"EKS"},{"cloud_id":4,"cloud_name":"Packet"},{"cloud_id":5,"cloud_name":"GCP"},{"cloud_id":6,"cloud_name":"AWS"}];
 var json ={"id": "dummy_id","sha": "dummy_commit_sha","ref": "dummy","status": "pending","web_url": "dummy json"};
@@ -359,11 +359,7 @@ build.jiva_pipeline().then(function(data) {
             }
         }
     }
-    if (builddata[0] != undefined) {
-        builddata[0] = builddata[0].concat(data);
-        // console.log(builddata[0])
-        builddata[1] = data;
-    } 
+    builddata[1] = data;
 }).catch(function (err) {
     console.log("jiva build pipeline error ->",err);
 }).then(function() {
@@ -380,45 +376,42 @@ build.jiva_pipeline().then(function(data) {
 }).catch(function (err) {
     console.log("jiva build pipeline jobs error ->",err);
 });
-// ------------------------------ build zfs ---------------------------
-build.zfs_pipeline().then(function(data) {
+// ------------------------------ build cstor ---------------------------
+build.cstor_pipeline().then(function(data) {
     for (var i = 0; i < data.length; i++) {
-        data[i].name = "zfs";
+        data[i].name = "cStor";
         data[i].commit_url = "https://github.com/openebs/zfs/commit/"+data[i].sha;
         var p_id = data[i].id;
         var k = 0;
-        if (zfs_job != "" && zfs_job[k] != undefined) {
-            while(zfs_job[k][0].pipeline.id !== p_id) {
+        if (cstor_job != "" && cstor_job[k] != undefined) {
+            while(cstor_job[k][0].pipeline.id !== p_id) {
                 k++;
-                if(zfs_job[k] == undefined) {
+                if(cstor_job[k] == undefined) {
                     break;
                 }
             }
-            if(zfs_job[k] != undefined && zfs_job[k][0].pipeline.id == p_id) {
-                data[i].jobs = zfs_job[k];
+            if(cstor_job[k] != undefined && cstor_job[k][0].pipeline.id == p_id) {
+                data[i].jobs = cstor_job[k];
                 k = 0;
             }
         }
     }
-    if (builddata[0] != undefined) {
-        builddata[0] = builddata[0].concat(data);
-        builddata[2] = data;
-    } 
+    builddata[2] = data;
 }).catch(function (err) {
-    console.log("zfs build pipeline error ->",err);
+    console.log("cstor build pipeline error ->",err);
 }).then(function() {
     var index = 0;
     if (builddata[2] != undefined) {
         for(var p = 0; p < builddata[2].length; p++) {
-            build.zfs_jobs(builddata[2][p].id).then(function(data) {
+            build.cstor_jobs(builddata[2][p].id).then(function(data) {
                 data[0]['updated'] = time.calculate(data[0]);
-                zfs_job[index] = data;
+                cstor_job[index] = data;
                 index++;
             });
         }
     }
 }).catch(function (err) {
-    console.log("zfs build pipeline jobs error ->",err);
+    console.log("cstor build pipeline jobs error ->",err);
 });
 
 // ------------------------------ build istgt ---------------------------
@@ -441,9 +434,9 @@ build.istgt_pipeline().then(function(data) {
             }
         }
     }
-    if (builddata[0] != undefined) {
-        builddata[0] = builddata[0].concat(data);
-        builddata[3] = data;
+    builddata[3] = data;
+    if (builddata[1] != undefined && builddata[2] != undefined && builddata[3] != undefined) {
+        temp[0] = builddata[0].concat(builddata[1], builddata[2], builddata[3]);
     } 
 }).catch(function (err) {
     console.log("istgt build pipeline error ->",err);
@@ -462,8 +455,8 @@ build.istgt_pipeline().then(function(data) {
     console.log("istgt build pipeline jobs error ->",err);
 });
 //  Sorting data by their id
-if (builddata[0] != undefined) {
-    builddata[0].sort(sort_by('id', true, parseInt));
+if (temp[0] != undefined) {
+    temp[0].sort(sort_by('id', true, parseInt));
     function sort_by(field, reverse, primer) {
         var key = primer ? 
             function(x) {return primer(x[field])} : 
@@ -471,16 +464,13 @@ if (builddata[0] != undefined) {
         reverse = !reverse ? 1 : -1;
         return function (a, b) {
             return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
-        } 
+        }
     }
 }
-// for (var i = 0; i < 20; i++) {
-//     data2[i] = data[i]
-// }
 //sorting end
 
 // ------------  Build data End  ------------------------
-    dashboard = { "dashboard" : { "pipelines": pipelines , "build": builddata[0], "cloud" : cloud }}; 
+    dashboard = { "dashboard" : { "pipelines": pipelines ,"build": temp[0], "cloud" : cloud }};
     app.get("/", function(req, res)  {
         res.json(dashboard);
     });

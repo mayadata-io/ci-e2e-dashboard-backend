@@ -37,13 +37,13 @@ module.exports = {
         });
     },
 
-    zfs_pipeline:function() {
-        var zfs = {
+    cstor_pipeline:function() {
+        var cstor = {
             url: "https://gitlab.openebs.ci/api/v4/projects/17/pipelines",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
-            request(zfs, function(err, response, body) {
+            request(cstor, function(err, response, body) {
                 if (err  || response.statusCode != 200) {
                     reject(err);
                 } else {
@@ -54,13 +54,13 @@ module.exports = {
         });
     },
 
-    zfs_jobs:function(id) {
-        var zfs_job = {
+    cstor_jobs:function(id) {
+        var cstor_job = {
             url: "https://gitlab.openebs.ci/api/v4/projects/17/pipelines/+"+id+"/jobs?per_page=50",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
-            request(zfs_job, function(err, response, body) {
+            request(cstor_job, function(err, response, body) {
                 if (err  || response.statusCode != 200) {
                     reject(err);
                 } else {
