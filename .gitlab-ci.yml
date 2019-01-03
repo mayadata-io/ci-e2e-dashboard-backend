@@ -21,11 +21,11 @@ before_script:
 
 build-staging:
   only:
-  - staging
+  - group-runner
   script :
   - export REPO=mayadata/staging-dashboard-ci-backend
   - export COMMIT=${CI_COMMIT_SHA:0:8}
-  - docker login -u "$DOCKER_USER" -p "$DOCKER_PASS" && docker build --no-cache -t $REPO:$COMMIT . && docker push $REPO:$COMMIT
+  - docker login -u "$DOCKER_USER" -p "$DOCKER_PASS" && docker build --no-cache -t $REPO:$COMMIT . #&& docker push $REPO:$COMMIT
   - docker images
   - docker rmi $REPO:$COMMIT
   - docker images
