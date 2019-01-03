@@ -1,5 +1,5 @@
-image: docker:stable
-variables:
+#image: docker:stable
+#variables:
   # When using dind service we need to instruct docker, to talk with the
   # daemon started inside of the service. The daemon is available with
   # a network connection instead of the default /var/run/docker.sock socket.
@@ -12,9 +12,9 @@ variables:
   # to the job container
   # When using dind, it's wise to use the overlayfs driver for
   # improved performance.
-  DOCKER_DRIVER: overlay2
-services:
-- docker:dind
+  #DOCKER_DRIVER: overlay2
+#services:
+#- docker:dind
 
 before_script:
 - docker info
