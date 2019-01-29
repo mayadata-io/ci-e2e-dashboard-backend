@@ -5,7 +5,7 @@ var gitlab_private_token = process.env.token;
 module.exports = {
     istgt_pipeline:function() {
         var istgt = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/18/pipelines",
+            url: "https://gitlab.openebs.ci/api/v4/projects/18/pipelines?ref=replication",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -39,7 +39,7 @@ module.exports = {
 
     zfs_pipeline:function() {
         var zfs = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/17/pipelines",
+            url: "https://gitlab.openebs.ci/api/v4/projects/17/pipelines?ref=zfs-0.7-release",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
