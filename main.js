@@ -242,7 +242,7 @@ build.jiva_pipeline().then(function(data) {
 // ------------------------------ build zfs ---------------------------
 build.zfs_pipeline().then(function(data) {
     for (var i = 0; i < data.length; i++) {
-        data[i].name = "zfs";
+        data[i].name = "cStor";
         data[i].commit_url = "https://github.com/openebs/zfs/commit/"+data[i].sha;
         var p_id = data[i].id;
         var k = 0;
