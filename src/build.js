@@ -5,7 +5,7 @@ var gitlab_private_token = process.env.token;
 module.exports = {
     istgt_pipeline:function() {
         var istgt = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/18/pipelines?ref=replication",
+            url: "https://gitlab.openebs100.io/api/v4/projects/5/pipelines?ref=replication",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -22,7 +22,7 @@ module.exports = {
 
     istgt_jobs:function(id) {
         var istgt_job = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/18/pipelines/+"+id+"/jobs?per_page=50",
+            url: "https://gitlab.openebs100.io/api/v4/projects/5/pipelines/+"+id+"/jobs?per_page=50",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -39,7 +39,7 @@ module.exports = {
 
     zfs_pipeline:function() {
         var zfs = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/17/pipelines?ref=zfs-0.7-release",
+            url: "https://gitlab.openebs100.io/api/v4/projects/8/pipelines?ref=zfs-0.7-release",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -56,7 +56,7 @@ module.exports = {
 
     zfs_jobs:function(id) {
         var zfs_job = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/17/pipelines/+"+id+"/jobs?per_page=50",
+            url: "https://gitlab.openebs100.io/api/v4/projects/8/pipelines/+"+id+"/jobs?per_page=50",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -73,7 +73,7 @@ module.exports = {
 
     maya_pipeline:function() {
         var maya = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/8/pipelines?ref=master",
+            url: "https://gitlab.openebs100.io/api/v4/projects/7/pipelines?ref=master",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -92,7 +92,7 @@ module.exports = {
 
     maya_jobs:function(id) {
         var maya_job = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/8/pipelines/+"+id+"/jobs?per_page=50",
+            url: "https://gitlab.openebs100.io/api/v4/projects/7/pipelines/+"+id+"/jobs?per_page=50",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -111,7 +111,7 @@ module.exports = {
 
     jiva_pipeline:function() {
         var jiva = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/7/pipelines?ref=master",
+            url: "https://gitlab.openebs100.io/api/v4/projects/6/pipelines?ref=master",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
@@ -129,7 +129,7 @@ module.exports = {
     },
     jiva_jobs:function(id) {
         var jiva = {
-            url: "https://gitlab.openebs.ci/api/v4/projects/7/pipelines/+"+id+"/jobs?per_page=50",
+            url: "https://gitlab.openebs100.io/api/v4/projects/6/pipelines/+"+id+"/jobs?per_page=50",
             headers: {'PRIVATE-TOKEN': gitlab_private_token}
         };
         return new Promise(function(resolve, reject){
