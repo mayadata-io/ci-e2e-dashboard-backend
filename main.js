@@ -7,7 +7,7 @@ var packet = require('./src/packet');
 var time = require('./src/time-calculate');
 var log_link = require('./src/kibana_log');
 var build = require('./src/build');
-var dashboard = [], pipelines = [], packet_job = [], packet_job = [], builddata = [], istgt_job = [], zfs_job = [], maya_job = [], jiva_job = [], build_data_temp = [];
+var dashboard = [], pipelines = [], packet_job_v11 = [], packet_job_v12 = [], packet_job_v13 = [], builddata = [], istgt_job = [], zfs_job = [], maya_job = [], jiva_job = [], build_data_temp = [];
 
 var json ={"id": "dummy_id","sha": "dummy_commit_sha","ref": "dummy","status": "pending","web_url": "dummy json"};
 function main() {
@@ -25,15 +25,15 @@ function main() {
         for (var i = 0; i < data.length; i++) {
             var p_id = data[i].id;
             var k = 0;
-            if (packet_job != "" && packet_job[k] != undefined) {
-                while(packet_job[k][0].pipeline.id !== p_id) {
+            if (packet_job_v11 != "" && packet_job_v11[k] != undefined) {
+                while(packet_job_v11[k][0].pipeline.id !== p_id) {
                     k++;
-                    if(packet_job[k] == undefined) {
+                    if(packet_job_v11[k] == undefined) {
                         break;
                     }
                 }
-                if(packet_job[k] != undefined && packet_job[k][0].pipeline.id == p_id) {
-                    data[i].jobs = packet_job[k];
+                if(packet_job_v11[k] != undefined && packet_job_v11[k][0].pipeline.id == p_id) {
+                    data[i].jobs = packet_job_v11[k];
                     k = 0;
                     data[i].log_link = log_link.kibana_log(data[i].sha, p_id, data[i]);
                 }
@@ -47,8 +47,10 @@ function main() {
         if (pipelines[0] != undefined) {
             for(var p = 0; p < pipelines[0].length; p++) {
                 packet.packet_jobs(pipelines[0][p].id).then(function(data) {
-                    packet_job[index] = data;
-                    index++;
+                if (data != "") {
+                    packet_job_v11[index] = data;
+                }
+                index++;
                 });
             }
         }
@@ -70,15 +72,15 @@ packet.packet_pipeline("k8s-1-12").then(function(data) {
     for (var i = 0; i < data.length; i++) {
         var p_id = data[i].id
         var k = 0;
-        if (packet_job != "" && packet_job[k] != undefined) {
-            while(packet_job[k][0].pipeline.id !== p_id) {
+        if (packet_job_v12 != "" && packet_job_v12[k] != undefined) {
+            while(packet_job_v12[k][0].pipeline.id !== p_id) {
                 k++;
-                if(packet_job[k] == undefined) {
+                if(packet_job_v12[k] == undefined) {
                     break;
                 }
             }
-            if(packet_job[k] != undefined && packet_job[k][0].pipeline.id == p_id) {
-                data[i].jobs = packet_job[k];
+            if(packet_job_v12[k] != undefined && packet_job_v12[k][0].pipeline.id == p_id) {
+                data[i].jobs = packet_job_v12[k];
                 k = 0;
                 data[i].log_link = log_link.kibana_log(data[i].sha, p_id, data[i]);
             }
@@ -92,7 +94,9 @@ packet.packet_pipeline("k8s-1-12").then(function(data) {
     if (pipelines[1] != undefined) {
         for(var p = 0; p < pipelines[1].length; p++) {
             packet.packet_jobs(pipelines[1][p].id).then(function(data) {
-                packet_job[index] = data;
+                if (data != "") {
+                    packet_job_v12[index] = data;
+                }
                 index++;
             });
         }
@@ -115,15 +119,15 @@ packet.packet_pipeline("k8s-1-13").then(function(data) {
     for (var i = 0; i < data.length; i++) {
         var p_id = data[i].id
         var k = 0;
-        if (packet_job != "" && packet_job[k] != undefined) {
-            while(packet_job[k][0].pipeline.id !== p_id) {
+        if (packet_job_v13 != "" && packet_job_v13[k] != undefined) {
+            while(packet_job_v13[k][0].pipeline.id !== p_id) {
                 k++;
-                if(packet_job[k] == undefined) {
+                if(packet_job_v13[k] == undefined) {
                     break;
                 }
             }
-            if(packet_job[k] != undefined && packet_job[k][0].pipeline.id == p_id) {
-                data[i].jobs = packet_job[k];
+            if(packet_job_v13[k] != undefined && packet_job_v13[k][0].pipeline.id == p_id) {
+                data[i].jobs = packet_job_v13[k];
                 k = 0;
                 data[i].log_link = log_link.kibana_log(data[i].sha, p_id, data[i]);
             }
@@ -137,7 +141,9 @@ packet.packet_pipeline("k8s-1-13").then(function(data) {
     if (pipelines[2] != undefined) {
         for(var p = 0; p < pipelines[2].length; p++) {
             packet.packet_jobs(pipelines[2][p].id).then(function(data) {
-                packet_job[index] = data;
+                if (data != "") {
+                    packet_job_v13[index] = data;
+                }
                 index++;
             });
         }
@@ -291,7 +297,7 @@ build.istgt_pipeline().then(function(data) {
         }
     }
     builddata[3] = data;
-    if (builddata[0] != undefined && builddata[1] != "" && builddata[2] != "" && builddata[3] != "") {
+    if (builddata[0] != undefined && builddata[1] != undefined && builddata[2] != undefined && builddata[3] != undefined) {
         build_data_temp[0] = builddata[0].concat(builddata[1], builddata[2], builddata[3]);
     } 
 }).catch(function (err) {
@@ -339,7 +345,7 @@ main();
 
 setInterval(function() {
     main();
-},120000 );
+},30000 );
 
 app.listen(port, function() {
     console.log("server is listening on port:", port);
